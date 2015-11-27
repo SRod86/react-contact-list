@@ -10,19 +10,38 @@
     <script src="https://cdn.jsdelivr.net/react/0.14.0-rc1/react.js"></script>
     <script src="https://cdn.jsdelivr.net/react/0.14.0-rc1/react-dom.js"></script>
     <script>
+      var contacts = [
+        { key: 1, name: 'Steven Rodriguez', email: 'sfrodriguez86@gmail.com', description: 'Video game nerd' },
+        { key: 2, name: 'This Guy', email: 'thisguy@email.com' },
+        { key: 3, name: 'That Guy', description: 'That guy nerd' },
+      ]
+
+      var ContactItem = React.createClass({
+        propTypes: {
+          name: React.PropTypes.string.isRequired,
+          email: React.PropTypes.string.isRequired,
+          description: React.PropTypes.string,
+        },
+
+        render: function() {
+          return (
+            React.createElement('li', { className: 'Contact' },
+              React.createElement('h2', { className: 'Contact-name' }, this.props.name),
+              React.createElement('a', { href: 'mailto:' + this.props.email, className: 'Contact-email' }, this.props.email),
+              React.createElement('div', { className: 'Contact-description' }, this.props.description)
+            )
+          )
+        },
+      })
+
+      var contactItemElements = contacts
+        .filter(function(contact) { return contact.email; })
+        .map(function(contact) { return React.createElement(ContactItem, contact) })
+
       var rootElement =
         React.createElement('div', {},
           React.createElement('h1', {}, "Contacts"),
-          React.createElement('ul', {},
-            React.createElement('li', {},
-              React.createElement('h2', {}, "Steven Rodriguez"),
-              React.createElement('a', { href: 'mailto:sfrodriguez86@gmail.com' }, 'sfrodriguez86@gmail.com')
-            ),
-            React.createElement('li', {},
-              React.createElement('h2', {}, "Tracey Ward"),
-              React.createElement('a', { href: 'mailto:trw0588@gmail.com' }, 'trw0588@gmail.com')
-            )
-          )
+          React.createElement('ul', {}, contactItemElements)
         )
 
       ReactDOM.render(rootElement, document.getElementById('react-app'))
