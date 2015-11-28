@@ -11,35 +11,40 @@
     <script src="https://cdn.jsdelivr.net/react/0.14.0-rc1/react.js"></script>
     <script src="https://cdn.jsdelivr.net/react/0.14.0-rc1/react-dom.js"></script>
     <script>
-      var contacts = [
-        { key: 1, name: 'Steven Rodriguez', email: 'sfrodriguez86@gmail.com', description: 'Video game nerd' },
-        { key: 2, name: 'This Guy', email: 'thisguy@email.com' },
-        { key: 3, name: 'That Guy', description: 'That guy nerd' },
-      ]
-
-      var newContact = { name: "", email: "", description: "" }
-
       var ContactForm = React.createClass({
         propTypes: {
-          contact: React.PropTypes.object.isRequired
+          value: React.PropTypes.object.isRequired,
+          onChange: React.PropTypes.func.isRequired,
         },
 
         render: function() {
+          var oldContact = this.props.value;
+          var onChange = this.props.onChange;
+
           return (
             React.createElement('form', { className: 'ContactForm' },
               React.createElement('input', {
                 type: 'text',
                 placeholder: 'Name (required)',
-                value: this.props.contact.name,
+                value: this.props.value.name,
+                onChange: function(e) {
+                  onChange(Object.assign({}, oldContact, { name: e.target.value }));
+                },
               }),
               React.createElement('input', {
-                type: 'text',
+                type: 'email',
                 placeholder: 'Email',
-                value: this.props.contact.email
+                value: this.props.value.email,
+                onChange: function(e) {
+                  onChange(Object.assign({}, oldContact, { email: e.target.value }));
+                },
               }),
               React.createElement('textarea', {
-                placeholder: 'description',
-                value: this.props.contact.description
+                placeholder: 'Description',
+                value: this.props.value.description,
+                onChange: function(e) {
+                  onChange(Object.assign({}, oldContact, { description: e.target.value }));
+                },
               }),
               React.createElement('button', { type: 'submit' }, "Add Contact")
             )
@@ -69,6 +74,7 @@
         propTypes: {
           contacts: React.PropTypes.array.isRequired,
           newContact: React.PropTypes.object.isRequired,
+          onNewContactChange: React.PropTypes.func.isRequired,
         },
 
         render: function() {
@@ -80,18 +86,42 @@
             React.createElement('div', { className: 'ContactView' },
               React.createElement('h1', { className: 'ContactView-title' }, "Contacts"),
               React.createElement('ul', { className: 'ContactView-list' }, contactItemElements),
-              React.createElement(ContactForm, { contact: this.props.newContact })
+              React.createElement(ContactForm, {
+                value: this.props.newContact,
+                onChange: this.props.onNewContactChange,
+              })
             )
           )
         },
       })
 
-      var rootElement = React.createElement(ContactView, {
-        contacts: contacts,
-        newContact: newContact
-      })
+      function updateNewContact(contact) {
+        setState({ newContact: contact });
+      }
 
-      ReactDOM.render(rootElement, document.getElementById('react-app'))
+      var state = {};
+
+      function setState(changes) {
+        Object.assign(state, changes);
+
+        ReactDOM.render(
+          React.createElement(ContactView, Object.assign({}, state, {
+            onNewContactChange: updateNewContact,
+          })),
+          document.getElementById('react-app')
+        );
+      }
+
+      // Set initial state
+      setState({
+        contacts: [
+          { key: 1, name: 'Steven Rodriguez', email: 'sfrodriguez86@gmail.com', description: 'Video game nerd' },
+          { key: 2, name: 'This Guy', email: 'thisguy@email.com' },
+          { key: 3, name: 'That Guy', description: 'That guy nerd' },
+        ],
+        newContact: { name: "", email: "", description: "" },
+      });
+
     </script>
   </body>
 </html>
